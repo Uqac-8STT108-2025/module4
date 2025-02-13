@@ -1,0 +1,166 @@
+---
+title: "module4"
+author: "GroupeB"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r librairies_importation, include=FALSE}
+#install.packages("ISLR")
+library(tidyverse)
+library("ISLR") #pour charger la librairie auto
+```
+
+### Exercice1 :
+
+* Description des hypothèses nulles :
+Pour chaque variable, l'hypothèse nulle  stipule que cette qu'elle n'a aucun effet significatif sur les ventes. 
+C'est à dire : 
+
+   - TV ; H_0 : " Les dépenses en publicité télévisée n'ont pas d'effet sur les ventes."
+   
+   - Radio ; H_0: "Les dépenses en publicité radio n'ont pas d'effet sur les ventes."
+   
+   - Journaux ; H_0 : "Les dépenses en publicité dans les journaux n'ont pas d'effet sur les ventes."
+   
+   - Intercept ; H_0 : "La variable de référence (elle n'est pas explicitement mentionnée dans le cadre de l'exercice) 
+   est non négligeable lorsque toutes les variables indépendantes sont nulles."
+   
+   
+   
+  **Interprétation des résultats** :
+  
+Publicité télévisée et radio : un effet significatif sur les ventes
+
+Les valeurs p pour la TV (<0.0001) et la radio (<0.0001) sont très faibles.
+Cela signifie que nous rejetons l'hypothèse nulle dans ces deux cas : il y a des preuves statistiques fortes que la publicité télévisée et la publicité radio ont un effet significatif sur les ventes.
+Publicité dans les journaux : pas d'effet significatif sur les ventes
+
+La valeur p de la publicité dans les journaux (0.8599) est très élevée.
+Cela signifie que nous ne rejetons pas l'hypothèse nulle : il n'y a pas de preuve statistique que la publicité dans les journaux ait un impact sur les ventes. Autrement dit, investir dans ce type de publicité ne semble pas influencer significativement les ventes.
+Intercept : significatif
+
+La valeur p associée à l'intercept est <0.0001, donc on rejette l'hypothèse nulle.
+Cela suggère qu'il existe un niveau de ventes de base même en l'absence de dépenses publicitaires.
+
+Finalement, Les entreprises devraient privilégier la publicité télévisée et radio pour augmenter les ventes, car ces deux formes de publicité ont un impact statistiquement significatif.
+
+### Exercice 2:
+
+#### a) Choix de la bonne réponse : 
+
+Nous avons $$\hat{y} = \beta _0\times + \beta _1\times GPA + \beta _2 \times QI
++ \beta _3\times Level + \beta _4\times(GPA\times QI) + \beta _5\times(GPA\times Level) + \epsilon$$
+
+
+où :
+
+- Level 1 est pour les diplômés du collège ; 
+
+- Level 2 pour ceux du secondaire 
+
+* Pour un diplômé du Lycée,(Level = 0), on a 
+
+$$ \hat{y}_{Lycee} = \beta _0 +\beta _1 \times GPA + \beta _2 \times QI + \beta _4 \times GPA \times QI $$
+
+* Pour un  diplômé du collège = universitaire : (Level = 1) on a 
+
+$$ \hat{y}_{col} = \beta _0 +\beta _1 \times GPA + \beta _2 \times QI + \beta _3 + \beta _4 \times (GPA \times QI) + \beta _5 \times GPA $$
+
+* On évalue maintenant la différence pour pouvoir comparer :
+
+$$ \hat{y}_{col} - \hat{y}_{lycee} = (beta _0 +\beta _1 \times GPA + \beta _2 \times QI + \beta _3 + \beta _4 \times (GPA \times QI) + \beta _5 \times GPA) - (\beta _0 +\beta _1 \times GPA + \beta _2 \times QI + \beta _4 \times GPA \times QI)$$ 
+
+  $$\hat{y}_{col} - \hat{y}_{lycee} = \beta _3 + \beta _5 \times GPA$$
+La bonne réponse est 
+
+iV ) Pour une valeur fixe de QI et de GPA, les diplômés universitaires gagnent en moyenne plus que les diplômés du secondaire, à condition que la GPA soit suffisamment élevée.
+Mais pour que ça marche, il faut bien sûr que $\beta_3 >0$
+
+#### b) 
+Prédiction  du salaire d’un diplômé universitaire avec un QI de 110 et une moyenne cumulative de 4,0.
+
+$$ \hat{y}_{col} = \beta _0 +\beta _1 \times GPA + \beta _2 \times QI + \beta _3 + \beta _4 \times (GPA \times QI) + \beta _5 \times GPA $$
+$$ \hat{y}_{col} = \beta _0 +\beta _1 \times 4.5 + \beta _2 \times 110 + \beta _3 + \beta _4 \times (4.0 \times 110) + \beta _5 \times 4.0 $$
+$$ \hat{y}_{col} = \beta _0 +4.0 \beta _1  + 110 \beta _2  + \beta _3 + 440.0 \beta _4  + 4 \beta _5  $$
+Il manque les coefficients $\beta_i$ pour donner une prédiction numerique. 
+
+#### c ) Réponse : 
+Faux, ce n'est pas la valeur d'un coefficient qui détermine son interaction ou non, mais plutôt la p-value.
+
+### Question 3 :
+
+a ) On s'attend à ce que la RSS du modèle cubique soit plus petit que celle du modèle linéaire sur les données
+d'entrainement. Par ce que le modèle cubique a plus de paramètres et capte plus de bruit, ce qui réduit significativement sa RSE.
+
+b) regression linéaire : y_hat = a  + bX
+
+Regression cubique : y_hat = a + bX + c X^2 + d X^3
+
+Hypothèse nulle : c = d = 0
+
+Si l'hypothèse nulle est rejeté (p-value significativement petit), alors le modèle cubique 
+s'ajuste mieux aux donnée.
+
+c ) (pas sur !) En toutes circonstances, la regression quadratique capte plus de bruit que la regression lineaire.
+Donc la RSE est necessairement plus petite si elle est calculée sur les données test.
+
+### Question 4 :
+
+Question incomplete
+
+### Question 5 :
+
+Démontrons que dans le cas d’une régression linéaire simple, la droite des moindres carrés passe toujours par le point
+moyen $G(\overline{x}, \overline{y})$.
+
+L'équation d'une regression linéaire simple est donnée par $\hat{y} = a X + b + \epsilon$
+
+où $$ b= \frac{\sum(x_i - \overline{x})(y_i - \overline{y})}{\sum(x_i - \overline{x})^2} $$ et 
+$$b = \overline{y} - a \overline{x}$$
+dès lors, $$a\overline{x} +b +\epsilon = a\overline{x} + \overline{y} - a \overline{x} \approx  \overline{y}  
+ $$     cqfd.
+ 
+### Question 6 
+incomplet
+
+## Pratique: 
+
+### Exercice 1 
+
+#### a) 
+
+```{r regression-lineaire}
+modele_lineaire <- lm(mpg ~ horsepower, data = Auto)
+summary(modele_lineaire)
+```
+
+##### i )  
+**p-value: < 2.2e-16 ** --> oui il existe une relation entre le prédicteur et la réponse ?
+
+##### ii ) 
+force de la relation entre le prédicteur et la réponse  : **R^2  0.6059** --> 60.59 % de la variabilité 
+des prédictions de mpg à partir de horsepower sont expliquées par le modèle.
+
+##### iii ) 
+Signe de la relation : horsepower = -0.157845, c-a-d $\beta_ 1 <0 --> $ les deux variables évoluent en sens contraire.
+
+##### iv ) 
+mpg prévu associé à une puissance de 98 chevaux ?
+
+```{r prediction-mpg}
+predire_mpg <- function(horsepower) {
+  b_0 <- 39.935861
+  b_1 <- -0.157845
+  return(b_0 + b_1 * horsepower)
+}
+predire_mpg(98)
+```
+La valeur prédite pour 98 cheveaux est **mpg_hat = `r round(predire_mpg(98),2)`**
+
+
+
+
+
+
+ 
