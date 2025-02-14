@@ -158,9 +158,43 @@ predire_mpg(98)
 ```
 La valeur prédite pour 98 cheveaux est **mpg_hat = `r round(predire_mpg(98),2)`**
 
+#### a)
+graphique entre la réponse (mpg) et le prédicteur.
+
+```{r graphique-modele-lineaire}
+plot(Auto$horsepower, Auto$mpg, 
+     main = "Relation entre MPG et Horsepower", 
+     xlab = "Horsepower", 
+     ylab = "MPG", 
+     col = "blue")  
+abline(modele_lineaire, col = "black",lwd = 3)  
+legend("topright", legend = "Droite de régression", col = "black", lwd = 3)
+
+```
 
 
 
 
 
+#### c) 
+
+```{r verifications-modele-lineaire }
+# Générer les diagnostics du modèle
+par(mfrow = c(2, 2))  
+plot(modele_lineaire)  
+```
+commentaires :
+
+* La distribution des résidus a une forme quadratique,, ce qui pose problème, elle ne doit pas avoir 
+une répartition perceptible
+
+* Le diagramme Quantiles-quantile a une forme lineaire --> Les résidus suivent une distribution normale
+
+### Exercice 2 
+
+#### a)
+Produisons une matrice de nuages de points qui inclut toutes les variables de l’ensemble de données.
+
+```{r matrice-correlation}
+```
  
