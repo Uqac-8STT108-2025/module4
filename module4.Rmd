@@ -158,7 +158,7 @@ predire_mpg(98)
 ```
 La valeur prédite pour 98 cheveaux est **mpg_hat = `r round(predire_mpg(98),2)`**
 
-#### a)
+#### b)
 graphique entre la réponse (mpg) et le prédicteur.
 
 ```{r graphique-modele-lineaire}
@@ -172,9 +172,7 @@ legend("topright", legend = "Droite de régression", col = "black", lwd = 3)
 
 ```
 
-
-
-
+ v) Quels sont les intervalles de confiance et de prédiction à 95 % associés ?
 
 #### c) 
 
@@ -190,11 +188,313 @@ une répartition perceptible
 
 * Le diagramme Quantiles-quantile a une forme lineaire --> Les résidus suivent une distribution normale
 
-### Exercice 2 
+
+
+### Question 2 
+Cette question implique l’utilisation d’une régression linéaire multiple sur l’ensemble de données Auto.
 
 #### a)
 Produisons une matrice de nuages de points qui inclut toutes les variables de l’ensemble de données.
-
-```{r matrice-correlation}
+```{r}
+data(Auto) 
+pairs(Auto, main = "Matrice de nuages de points pour Auto")
 ```
+
+#### b)
+Calculons la matrice des corrélations entre les variables à l’aide de la fonction cor(). nous devions exclure la variable name qui est qualitative.
+
+```{r}
+data(Auto)
+#Extrait la variable "name"
+Auto_numeric <- Auto[, -which(names(Auto) == "name")]
+
+#Calculons la matrice des corrélations
+cor_matrix <- cor(Auto_numeric)
+
+print(round(cor_matrix, 2))
+```
+#### c) 
+Utilisons la fonction lm() pour effectuer une régression linéaire multiple avec mpg comme réponse et toutes les autres variables sauf le nom comme prédicteurs. Utilisez la fonction summary() pour imprimer les résultats. Commentons le résultat. Par exemple:
+
+ i- Existe-t-il une relation entre les prédicteurs et la réponse ?
+
+**p-value < 2.2e-16 pour le test F, ce qui indique confirment qu'il existe une forte relation entre les prédicteurs choisis et mpg, permettant de modéliser efficacement la consommation de carburant des véhicules présents dans le jeu de données Auto.
+
+```{r}
+data(Auto)
+modele_multiple <- lm(mpg ~ . - name, data = Auto)
+summary(modele_multiple)
+```
+
+ii- Quels prédicteurs semblent avoir une relation statistiquement significative avec la réponse ?
+
+Dans le modèle de régression multiple de (i), on vas sélectionner les prédicteurs qui présentent des p‑values très faibles (inférieures à 0,05):
+horsepower:p = 0,21
+weight: p = 2e‑16
+year:p < 2e‑16
+origin:p= 0,013
+
+iii-Que suggère le coefficient de la variable « année » 
+
+Le coefficient de la variable «année» est positif d'environ 0,75, ce qui suggère qu'en moyenne, chaque année additionnelle est associée à une augmentation d'environ 0,75 mpg. Autrement dit, les véhicules plus récents tendent à afficher une meilleure efficacité énergétique.
+
+
+
+#### d)
+Utilisons la fonction plot() pour produire des tracés de diagnostic de l’ajustement de régression linéaire. Commentez tous les problèmes que vous voyez avec l’ajustement. 
+
+Avec le modèle_simple
+
+```{r}
+#plaçons les graphe 2 a 2
+par(mfrow = c(2, 2))
+#graphe
+plot(modele_multiple)
+```
+* Les tracés résiduels suggèrent-ils des valeurs aberrantes inhabituellement importantes ? 
+
+D'après les tracés de diagnostic d'ajustement générés notamment le graphique "Residuals vs Fitted" et le "Residuals vs Leverage", aucun point ne se détache de manière excessive.
+les résidus semblent globalement aléatoires et bien répartis, sans valeurs aberrantes inhabituelles, et le graphique d'effet de levier ne signale pas d'observations avec un effet de levier exceptionnellement élevé.
+
+* Le graphique de l’effet de levier identifie-t-il des observations présentant un effet de levier inhabituellement élevé ?
+
+le graphique de l'effet de levier (résidus vs levier) ne révèle aucune observation se situant en dehors des limites habituelles, Aucun point ne présente un effet de levier anormalement.
+
+#### e)
+Utilisez les symboles * et : pour ajuster les modèles de régression linéaire avec des effets d’interaction. Certaines interactions semblent-elles statistiquement significatives ?
+
+Modèle avec interaction entre horsepower et year.
+
+le coefficient d'interaction est négatif et statistiquement significatif car p-value < 0.05, cela suggère que l'effet négatif de horsepower sur mpg devient plus prononcé pour des véhicules plus récents.
+
+le modele avec *
+
+```{r}
+modele_interaction <- lm(mpg ~ horsepower * year, data = Auto)
+summary(modele_interaction)
+```
+le modele avec :
+
+```{r}
+modele_interaction2 <- lm(mpg ~ horsepower : year, data = Auto)
+summary(modele_interaction2)
+```
+#### f) 
+Essayons quelques transformations différentes des variables, telles que log(X), sqrt(X), X*2 Commentons vos découvertes.
+
+Modèle original : Le modèle utilisant horsepower en l'état fournit une relation significative négative avec mpg.
+
+```{r}
+#Modèle avec la variable originale
+model_orig <- lm(mpg ~ horsepower, data = Auto)
+summary(model_orig)
+par(mfrow = c(2, 2))
+plot(model_orig, main = "Modèle original")
+```
+
+Transformation log :L'utilisation de log(horsepower) linéarise la relation qui était autrement curviligne dans le modèle original et montre une de l'ajustement.
+
+```{r}
+# Modèle avec log(horsepower)
+model_log <- lm(mpg ~ log(horsepower), data = Auto)
+summary(model_log)
+par(mfrow = c(2, 2))
+plot(model_log, main = "Modèle log(horsepower)")
+```
+
+
+Transformation racine carrée :Le modèle avec sqrt(horsepower) réduire l'impact des valeurs élevées, améliore la linéarité de la relation ce qui améliore la répartition des résidus.
+
+```{r}
+# Modèle avec racine carrée de horsepower
+model_sqrt <- lm(mpg ~ sqrt(horsepower), data = Auto)
+summary(model_sqrt)
+par(mfrow = c(2, 2))
+plot(model_sqrt, main = "Modèle sqrt(horsepower)")
+```
+
+Transformation au carré :cette transformation ne semble généralement pas apporter une signification, et le terme peut même rendre l'interprétation plus complexe.
+
+```{r}
+# Modèle avec horsepower au carré
+model_sq <- lm(mpg ~ I(horsepower^2), data = Auto)
+summary(model_sq)
+par(mfrow = c(2, 2))
+plot(model_sq, main = "Modèle horsepower^2")
+```
+### Question 3 
+
+#### a)
+Ajustons un modèle de régression multiple pour prédire les « Ventes » en utilisant « Prix », « Urbain » et « États-Unis ».
+
+Nous allons ajuster le modèle de regression multiple utiliser la haut
+
+```{r}
+data(Carseats)
+#Ajustons le modele utiliser la haut
+modele_carseats <- lm(Sales ~ Price + Urban + US, data = Carseats)
+summary(modele_carseats)
+```
+
+#### b)
+Fournissons une interprétation de chaque coefficient du modèle. Soyons prudent : certaines variables du modèle sont qualitatives !
+
+Intercept: 13.04 Ce coefficient représente la valeur prédite des ventes (Sales) pour le groupe de référence,les variables qualitatives sont codées en variables indicatrices. 
+l'interception correspond aux ventes moyennes prédites pour un magasin situé dans une zone urbaine (Urban = Yes) hors des États-Unis (US = No) avec un Prix égal à 0.
+
+Price: -0.054459 Pour chaque augmentation d'une unité du prix, en maintenant constantes toutes les autres variables, les ventes prédites diminuent en moyenne de 0.054459 unité. Cela indique que le prix a un effet négatif sur les ventes.
+
+UrbanNo : -0.021916 Cette variable est un indicateur qui vaut 1 lorsque le magasin n'est pas situé en zone urbaine (Urban = No) et 0 lorsque le magasin est en zone urbaine (Urban = Yes). 
+Le coefficient de -0.021916 suggère que, toutes choses égales par ailleurs, les magasins situés hors zone urbaine affichent des ventes prédites inférieures de 0.021916 unité par rapport aux magasins urbains. Cependant, cette différence n'est pas statistiquement significative car p-value ≈ 0,936.
+
+USYes : 1.200573 Cette variable indicatrice vaut 1 pour les magasins situés aux États‑Unis (US = Yes) et 0 pour ceux hors des États‑Unis (US = Ne).
+Le coefficient de 1.200573 indique qu'en moyenne, les magasins situés aux États-Unis affichent des ventes prédites supérieures de 1.200573 unité par rapport aux magasins non américains, toutes choses étant égales par ailleurs. Cet effet est très significatif car p-value < 2e‑1).
+
+```{r}
+modele_carseats <- lm(Sales ~ Price + Urban + US, data = Carseats)
+summary(modele_carseats)
+```
+#### c)
+Écrivons le modèle sous forme d’équation, en prenant soin de gérer correctement les variables qualitatives.
+
+Sales= coef(Intercept) + coef(price)*price + coef(UrbanNo)*(Urban=no) + coef(USYes)*(US= yes).
+
+ En application:
  
+Sales = 13.04 +(-0.054459)*price + (-0.21916)*(Urban=No) + (1.200573)*(US=Yes)
+
+NB:(Urban=No) vaut 1 si le magasin n'est pas en zone urbaine  sinon elle vaut 0 si (Urban = Yes).
+-(US=YES) vaut 1 si le magasin est situé aux États-Unis  sinon elle vaut 0 si (US = NO).
+
+#### d)
+Pour lequel des prédicteurs pouvez-vous rejeter l’hypothèse nulle H₀ : Bⱼ = 0 ?
+
+D'après le résumé du modèle sur l'ensemble de données Carseats price et us ont les plus faibles p-value, donc nous pouvons rejeter l'hypothèse nulle H₀ : Bⱼ = 0 pour les variables Price et US.
+
+#### e)
+Sur la base de notre réponse à la question précédente, ajustons un modèle plus petit qui utilise uniquement les prédicteurs pour lesquels il existe des preuves d’association avec le résultat.
+
+Ajustons le modèle réduit en ne retenant que les prédicteurs significatifs (Price et US) :
+
+```{r}
+data(Carseats)
+modele_carseats_small <- lm(Sales ~ Price + US, data = Carseats)
+summary(modele_carseats_small)
+```
+#### f)
+Dans quelle mesure les modèles (a) et (e) s’ajustent-ils aux données ?
+
+Les deux modèles s’ajustent globalement bien aux données. Par exemple, dans le modèle (a) complet qui inclut Price, Urban et US.Meme en ajustant un modèle réduit (modèle(e)) ne retenant que Price et US (car Urban n'est pas significatif), on obtient des statistiques très proches
+
+En gros la capacité prédictive du modèle est quasiment la même que l'on utilise ou non la variable Urban, ce qui confirme que seuls Price et US apportent une information significative pour expliquer Sales.
+
+#### g) 
+À l’aide du modèle de (e), obtenons des intervalles de confiance de 95 % pour le(s) coefficient(s).
+
+```{r}
+data(Carseats)
+modele_carseats_small <- lm(Sales ~ Price + US, data = Carseats)
+confint(modele_carseats_small, level = 0.95)
+```
+
+#### h) 
+Existe-t-il des preuves de valeurs aberrantes ou d’observations à effet de levier élevé dans le modèle de (e) ?
+
+Le graphique "Residuals vs Fitted" montre que les résidus sont bien répartis sans points extrêmes.
+Le "Normal QQ Plot" indique que les résidus suivent globalement une distribution normale.
+
+Le tracé "Residuals vs Leverage" ne met pas en évidence d'observations avec un effet de levier
+
+Dans l'ensemble, ces diagnostics ne révèlent pas de valeurs aberrantes ni d'observations avec un effet de levier excessif dans le modèle(e).
+
+```{r}
+data(Carseats)
+modele_carseats_small <- lm(Sales ~ Price + US, data = Carseats)
+par(mfrow = c(2, 2))
+plot(modele_carseats_small)
+```
+
+### Question 4
+
+```{r generation-alleatoire-predicteur}
+  set.seed(1)
+  x <- rnorm(100)
+  y <- 2 * x + rnorm(100)
+```
+
+#### a) 
+Regression lineaire sans intercept de y sur x
+
+```{r regression-sans-intercept-de-y-sur-x}
+modele_lin_yx <- lm(y~x+0)
+summary(modele_lin_yx)
+
+```
+* Estimation du coefficient :  **beta1_hat = 1.9939**,
+
+*erreur type : **std = 0.1065**,
+
+* statistique t : **t = 18.73**, 
+
+*p-value : **p < 2e-16  **
+
+* Commentaire : Il existe une correlation positive entre x et y. La p-value est extremement faible, ce qui signifie que nous rejetons l'hypothese nulle (beta1 = 0) ==> il y a une forte correlation lineaire entre ces deux variables, et 
+le coefficient estimé est significativement différent de 0.
+
+#### b)
+Regression lineaire sans intercept de x sur y
+
+```{r regression-sans-intercept-de-x-sur-y}
+modele_lin_xy <- lm(x~y+0)
+summary(modele_lin_xy)
+```
+* Estimation du coefficient : **beta1_hat = 0.39111 **
+
+* erreur type : **std = 0.02089**
+
+* statistique t : **t = 18.73**
+
+* p-value : **p <2e-16**
+
+* Commentaire : Il existe une correlation positive entre x et y. La p-value est extremement faible, ce qui signifie que nous rejetons l'hypothese nulle (beta_1 = 0) ==> il y a une forte correlation lineaire entre ces deux variables, et 
+le coefficient estimé est significativement différent de 0.
+
+#### c) 
+Les deux relations ont la même statistique t et la meme p-value. De plus, le produit des deux 
+coefficient est égal à R^2
+
+R^2= 0.7798 et   beta1_xy * beta1-yx  = `r  round(modele_lin_xy$coefficients * modele_lin_yx$coefficients,4)`
+
+#### d) 
+Question manquante
+
+#### e)
+Question manquante
+
+#### f)
+Dans R, montrez que lorsque la régression est effectuée avec un intercept la statistique t pour 
+est la même pour la régression de y sur x que pour la régression de x sur y.
+
+* Regression linéaire de y sur x avec intercept : 
+
+```{r regression-avec-intercept-de-y-sur-x, include=FALSE}
+modele_lin_yx_intercep <- lm(y~x)
+model_summary_yx <- summary(modele_lin_yx_intercep)
+t_stat_yx <- model_summary_yx$coefficients["x", "t value"]
+cat('la statistique du test est ' , t_stat_yx )
+```
+La statistique du test est : **t= `r t_stat_yx`**
+
+** Regression linéaire de x sur y avec intercept : 
+
+```{r regression-avec-intercept-de-x-sur-y, include= FALSE}
+modele_lin_xy_intercep <- lm(x~y)
+model_summary_xy <- summary(modele_lin_xy_intercep)
+t_stat_xy <- model_summary_yx$coefficients["x", "t value"]
+cat('la statistique du test est ' , t_stat_xy )
+
+```
+La statistique du test est : **t= `r t_stat_xy`**
+
+
+
