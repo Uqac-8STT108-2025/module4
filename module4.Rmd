@@ -195,7 +195,9 @@ Cette question implique l’utilisation d’une régression linéaire multiple s
 
 #### a)
 Produisons une matrice de nuages de points qui inclut toutes les variables de l’ensemble de données.
-```{r}
+
+```{r nuage_points}
+library(ISLR)
 data(Auto) 
 pairs(Auto, main = "Matrice de nuages de points pour Auto")
 ```
@@ -203,7 +205,7 @@ pairs(Auto, main = "Matrice de nuages de points pour Auto")
 #### b)
 Calculons la matrice des corrélations entre les variables à l’aide de la fonction cor(). nous devions exclure la variable name qui est qualitative.
 
-```{r}
+```{r matrice de correlation}
 data(Auto)
 #Extrait la variable "name"
 Auto_numeric <- Auto[, -which(names(Auto) == "name")]
@@ -220,7 +222,7 @@ Utilisons la fonction lm() pour effectuer une régression linéaire multiple ave
 
 **p-value < 2.2e-16 pour le test F, ce qui indique confirment qu'il existe une forte relation entre les prédicteurs choisis et mpg, permettant de modéliser efficacement la consommation de carburant des véhicules présents dans le jeu de données Auto.
 
-```{r}
+```{r relation_predicteurs}
 data(Auto)
 modele_multiple <- lm(mpg ~ . - name, data = Auto)
 summary(modele_multiple)
@@ -245,7 +247,7 @@ Utilisons la fonction plot() pour produire des tracés de diagnostic de l’ajus
 
 Avec le modèle_simple
 
-```{r}
+```{r modele_simple}
 #plaçons les graphe 2 a 2
 par(mfrow = c(2, 2))
 #graphe
@@ -269,13 +271,13 @@ le coefficient d'interaction est négatif et statistiquement significatif car p-
 
 le modele avec *
 
-```{r}
+```{r régression_linéaire}
 modele_interaction <- lm(mpg ~ horsepower * year, data = Auto)
 summary(modele_interaction)
 ```
 le modele avec :
 
-```{r}
+```{r regression_linéaire }
 modele_interaction2 <- lm(mpg ~ horsepower : year, data = Auto)
 summary(modele_interaction2)
 ```
@@ -284,7 +286,7 @@ Essayons quelques transformations différentes des variables, telles que log(X),
 
 Modèle original : Le modèle utilisant horsepower en l'état fournit une relation significative négative avec mpg.
 
-```{r}
+```{r modèle_original}
 #Modèle avec la variable originale
 model_orig <- lm(mpg ~ horsepower, data = Auto)
 summary(model_orig)
@@ -294,7 +296,7 @@ plot(model_orig, main = "Modèle original")
 
 Transformation log :L'utilisation de log(horsepower) linéarise la relation qui était autrement curviligne dans le modèle original et montre une de l'ajustement.
 
-```{r}
+```{r modèle_log(X)}
 # Modèle avec log(horsepower)
 model_log <- lm(mpg ~ log(horsepower), data = Auto)
 summary(model_log)
@@ -305,7 +307,7 @@ plot(model_log, main = "Modèle log(horsepower)")
 
 Transformation racine carrée :Le modèle avec sqrt(horsepower) réduire l'impact des valeurs élevées, améliore la linéarité de la relation ce qui améliore la répartition des résidus.
 
-```{r}
+```{r modèle_sqrt}
 # Modèle avec racine carrée de horsepower
 model_sqrt <- lm(mpg ~ sqrt(horsepower), data = Auto)
 summary(model_sqrt)
@@ -315,7 +317,7 @@ plot(model_sqrt, main = "Modèle sqrt(horsepower)")
 
 Transformation au carré :cette transformation ne semble généralement pas apporter une signification, et le terme peut même rendre l'interprétation plus complexe.
 
-```{r}
+```{r modèle_carrée}
 # Modèle avec horsepower au carré
 model_sq <- lm(mpg ~ I(horsepower^2), data = Auto)
 summary(model_sq)
@@ -329,7 +331,7 @@ Ajustons un modèle de régression multiple pour prédire les « Ventes » en ut
 
 Nous allons ajuster le modèle de regression multiple utiliser la haut
 
-```{r}
+```{r regression_multiple}
 data(Carseats)
 #Ajustons le modele utiliser la haut
 modele_carseats <- lm(Sales ~ Price + Urban + US, data = Carseats)
@@ -350,7 +352,7 @@ Le coefficient de -0.021916 suggère que, toutes choses égales par ailleurs, le
 USYes : 1.200573 Cette variable indicatrice vaut 1 pour les magasins situés aux États‑Unis (US = Yes) et 0 pour ceux hors des États‑Unis (US = Ne).
 Le coefficient de 1.200573 indique qu'en moyenne, les magasins situés aux États-Unis affichent des ventes prédites supérieures de 1.200573 unité par rapport aux magasins non américains, toutes choses étant égales par ailleurs. Cet effet est très significatif car p-value < 2e‑1).
 
-```{r}
+```{r modele_carseats}
 modele_carseats <- lm(Sales ~ Price + Urban + US, data = Carseats)
 summary(modele_carseats)
 ```
@@ -376,7 +378,7 @@ Sur la base de notre réponse à la question précédente, ajustons un modèle p
 
 Ajustons le modèle réduit en ne retenant que les prédicteurs significatifs (Price et US) :
 
-```{r}
+```{r predicteurs_association}
 data(Carseats)
 modele_carseats_small <- lm(Sales ~ Price + US, data = Carseats)
 summary(modele_carseats_small)
@@ -391,7 +393,7 @@ En gros la capacité prédictive du modèle est quasiment la même que l'on util
 #### g) 
 À l’aide du modèle de (e), obtenons des intervalles de confiance de 95 % pour le(s) coefficient(s).
 
-```{r}
+```{r intervall_confiance}
 data(Carseats)
 modele_carseats_small <- lm(Sales ~ Price + US, data = Carseats)
 confint(modele_carseats_small, level = 0.95)
@@ -407,7 +409,7 @@ Le tracé "Residuals vs Leverage" ne met pas en évidence d'observations avec un
 
 Dans l'ensemble, ces diagnostics ne révèlent pas de valeurs aberrantes ni d'observations avec un effet de levier excessif dans le modèle(e).
 
-```{r}
+```{r graphe observation levier}
 data(Carseats)
 modele_carseats_small <- lm(Sales ~ Price + US, data = Carseats)
 par(mfrow = c(2, 2))
@@ -497,4 +499,265 @@ cat('la statistique du test est ' , t_stat_xy )
 La statistique du test est : **t= `r t_stat_xy`**
 
 
+###Question 5
+
+#a-Dans quelles circonstances l’estimation du coefficient pour la régression de sur est-elle la même que l’estimation du coefficient pour la régression de sur  ?
+
+Dans une régression linéaire sans intercept,l'estimation du coefficient pour la régression de Y sur X est la même que celle de la régression de X sur Y uniquement lorsque la dispersion (la somme des carrés) de X est égale à celle de Y.
+
+#b-Générons un exemple dans R avec observations dans lequel l’estimation du coefficient pour la régression de sur est différente de l’estimation du coefficient pour la régression de sur .
+
+```{r exemple estimation du coefficient regression ou X diff Y}
+#Exemple : Y = 2 * X (donc c = 2)
+set.seed(123)
+x <- rnorm(100)
+y <- 2 * x
+
+#La régression sans intercept de Y sur X
+model_y_on_x <- lm(y ~ 0 + x)
+coef_y_on_x <- coef(model_y_on_x)
+
+#La régression sans intercept de X sur Y
+model_x_on_y <- lm(x ~ 0 + y)
+coef_x_on_y <- coef(model_x_on_y)
+
+cat("Coefficient pour la régression de Y sur X :", round(coef_y_on_x, 3), "\n")
+cat("Coefficient pour la régression de X sur Y :", round(coef_x_on_y, 3), "\n")
+```
+
+#c-Générons un exemple dans R avec observations dans lequel l’estimation du coefficient pour la régression de sur est la même que l’estimation du coefficient pour la régression de sur.
+
+```{r exemple estimation du coefficient regression ou X,Y}
+set.seed(123)
+x <- rnorm(100)
+y <- x  #Y est exactement égal à X
+
+#La régression sans intercept de Y sur X
+modele_Y_on_X <- lm(y ~ 0 + x)
+coef_Y_on_X <- coef(modele_Y_on_X)
+
+#La régression sans intercept de X sur Y
+modele_X_on_Y <- lm(x ~ 0 + y)
+coef_X_on_Y <- coef(modele_X_on_Y)
+
+cat("Coefficient pour la régression de Y sur X :", round(coef_Y_on_X, 3), "\n")
+cat("Coefficient pour la régression de X sur Y :", round(coef_X_on_Y, 3), "\n")
+```
+###Question 6
+
+#a)
+Pour créer un vecteur x de 100 observations tirées d'une distribution normale standard (N(0,1)) en assurant la reproductibilité, on vas utiliser
+:
+```{r vecteur x avec 100 observation}
+set.seed(1)
+x <- rnorm(100)
+```
+
+#b)
+Pour créer un vecteur eps de 100 observations issues d'une distribution normale avec une moyenne nulle et une variance de 0,25 (donc un écart type de 0,5), ont vas utiliser :
+
+```{r vecteur eps avec 100 observation }
+eps <- rnorm(100, mean = 0, sd = 0.5)
+```
+
+#c)
+En utilisant x et eps, générons un vecteur y selon le modèle 
+Quelle est la longueur du vecteur y ? 
+la longueur est 100
+
+Quelles sont les valeurs de et dans ce modèle linéaire ?
+La valeur est 2
+```{r vecteur y}
+y <- 2 + 2 * x + eps
+length(y)
+```
+
+
+#d)
+
+Le graphique montre une relation linéaire positive entre x et y, ce qui est conforme au modèle générateur x=2+2𝑥+𝜖de plus aucun comportement non linéaire ni valeurs aberrantes marquées ne semblent apparaître, ce qui confirme que la relation entre x et y est bien linéaire
+```{r graphe rtion entre X et Y}
+plot(x, y, main = "Nuage de points : x vs y", xlab = "x", ylab = "y", pch = 19, col = "blue")
+```
+
+#e)
+Le coefficient de l'interception est estimé à environ 2,03 et celui de x à environ 1,98, ce qui est très proche des valeurs théoriques 2 et 2.
+Les p‑values extrêmement faibles (p_value< 2e-16) indiquent que les deux coefficients sont très significatifs.
+Le Multiple R carrée (environ 0.941) montre que le modèle explique une grande partie de la variance de y.
+Ces résultats confirment que le modèle amélioré par moindres carrés reproduit correctement le modèle générateur x=2+2 x+ϵ.
+
+```{r modèle lineaire des moindres carrée }
+set.seed(1)
+x <- rnorm(100)
+#La variance = 0.25, écart type = 0.5
+eps <- rnorm(100, mean = 0, sd = 0.5) 
+y <- 2 + 2 * x + eps
+
+#L'ajustement du modèle linéaire
+modele <- lm(y ~ x)
+summary(modele)
+```
+#f)
+le nuage de points, ajoute la ligne de régression obtenue par les moindres carrés (modèle ajusté) et la vraie ligne de régression
+
+```{r Nuage de points avec ligne des moindres carrés et vraie régression}
+set.seed(1)
+x <- rnorm(100)
+#L'écart type = 0.5 pour une variance de 0.25
+eps <- rnorm(100, mean = 0, sd = 0.5)  
+y <- 2 + 2 * x + eps
+
+#La Création du nuage de points
+plot(x, y, main = "Nuage de points avec ligne des moindres carrés et vraie régression",
+     xlab = "x", ylab = "y", pch = 19, col = "gray")
+
+#L'ajustement du modèle linéaire par moindres carrés
+modele <- lm(y ~ x)
+
+#On ajout de la ligne des moindres carrés (fitted model) en bleu)
+abline(modele, col = "blue", lwd = 2)
+
+#on ajout de la vraie ligne de régression y = 2 + 2*x en rouge (trait pointillé)
+abline(a = 2, b = 2, col = "red", lwd = 2, lty = 2)
+
+#on ajout d'une légende
+legend("topleft", legend = c("Ligne des moindres carrés", "Régression de la population"),
+       col = c("blue", "red"), lty = c(1, 2), lwd = 2)
+```
+#g)
+
+Explication:
+le modèle générateur est x=2+2 x+ϵ(donc linéaire) et l'ajout du terme x² n'a pas apporter d'amélioration significative.
+Or dans le modèle polynomial, le coefficient associé à I(x²) permet d'évaluer l'effet quadratique.
+Si ce coefficient n'est pas statistiquement significatif (p-value > 0.05) et si le test d'ANOVA (comparaison entre le modèle linéaire et le modèle polynomial) ne montre pas une significative (p-value > 0.05), cela indique qu'il n'existe pas de preuves que le terme quadratique améliore l'ajustement du modèle.
+
+```{r modèle de régression polynomiale}
+set.seed(1)
+x <- rnorm(100)
+eps <- rnorm(100, mean = 0, sd = 0.5)
+y <- 2 + 2 * x + eps
+
+#Le modèle linéaire simple
+model_linear <- lm(y ~ x)
+
+#Le modèle polynomiale (avec x et x^2)
+model_poly <- lm(y ~ x + I(x^2))
+
+#Le résumés des modèles
+summary(model_linear)
+summary(model_poly)
+
+#La comparaison formelle par un test d'anova
+anova(model_linear, model_poly)
+```
+#h)
+En diminuant la variance du terme d'erreur, on obtient des estimations plus précises et un meilleur ajustement global du modèle aux données, tout en confirmant que le modèle linéaire simple est bien adapté à la structure de la relation simulée.
+
+```{r processus de génération de données pour diminuer le bruit}
+#(a) Générons des données avec moins de bruit
+set.seed(1)
+x <- rnorm(100)                        
+eps <- rnorm(100, mean = 0, sd = 0.25)   
+y <- 2 + 2 * x + eps                   
+
+#(b) Vérification de la longueur y=100
+length(y)  
+
+#(c) Nuage de points
+plot(x, y, main = "Nuage de points : x vs y (moins de bruit)",
+     xlab = "x", ylab = "y", pch = 19, col = "blue")
+
+#(d) Ajustement d'un modèle linéaire simple
+model_linear <- lm(y ~ x)
+summary(model_linear)
+
+#(e) Ajoutons de la droite des moindres carrés et de la vraie ligne de régression
+plot(x, y, main = "x vs y : Moindres carrés vs Vraie régression (moins de bruit)",
+     xlab = "x", ylab = "y", pch = 19, col = "gray")
+abline(model_linear, col = "blue", lwd = 2)
+abline(a = 2, b = 2, col = "red", lwd = 2, lty = 2)
+legend("topleft", legend = c("Modèle ajusté", "Modèle vrai"),
+       col = c("blue", "red"), lty = c(1, 2), lwd = 2)
+
+#(f) Ajustement d'un modèle de régression polynomiale (avec x et x^2) et comparaison
+model_poly <- lm(y ~ x + I(x^2))
+summary(model_poly)
+anova(model_linear, model_poly)
+```
+#i)
+
+Le fait d'augmenter la variance du terme d'erreur rend le modèle moins précis (erreurs standards plus élevées, R² plus faible), et le nuage de points montre une plus grande dispersion. Cependant, la relation linéaire reste clairement visible, et le modèle amélioré par moindres carrés reste cohérent avec le modèle théorique x=2+2 x+ϵ.
+
+```{r  génère des données avec plus de bruit}
+#(a) Générons des données avec plus de bruit
+set.seed(1)
+x <- rnorm(100)                       
+eps <- rnorm(100, mean = 0, sd = 1)      
+y <- 2 + 2 * x + eps                  
+
+#(b) Vérification de la longueur du vecteur y=100
+length(y)  
+
+#(c) Nuage de points entre x et y
+plot(x, y, main = "Nuage de points : x vs y (plus de bruit)",
+     xlab = "x", ylab = "y", pch = 19, col = "blue")
+
+#(d) Ajustement du modèle linéaire simple et résumé
+model_linear <- lm(y ~ x)
+summary(model_linear)
+
+#(e) Tracons les lignes : 
+plot(x, y, main = "x vs y : Modèle ajusté vs fonction vraie (plus de bruit)",
+     xlab = "x", ylab = "y", pch = 19, col = "gray")
+abline(model_linear, col = "blue", lwd = 2)
+abline(a = 2, b = 2, col = "red", lwd = 2, lty = 2) 
+legend("topleft", legend = c("Modèle ajusté", "Modèle vrai"),
+       col = c("blue", "red"), lty = c(1, 2), lwd = 2)
+
+#(f) Ajustement du modèle de régression polynomiale (incluant x et x^2)
+model_poly <- lm(y ~ x + I(x^2))
+summary(model_poly)
+
+#Comparaison entre le modèle linéaire simple et le modèle polynomial
+anova(model_linear, model_poly)
+```
+
+#j)
+
+Explication:
+Dans le jeu de données avec moins de bruit , la dispersion autour de la droite de régression est plus faible. Par conséquent, les intervalles de confiance pour l'interception et le coefficient de x sont très étroits, reflétant une incertitude moindre dans les estimations.
+
+Dans le jeu de données avec plus de bruit , la variabilité des observations autour de la droite est plus élevée, ce qui conduit à des erreurs standards plus grandes et à des intervalles de confiance plus larges. Les intervalles sont ainsi plus étendus, traduisant une incertitude accumulée dans l'estimation des coefficients.
+
+Dans le jeu de données original , les intervalles se situent entre ceux obtenus avec moins de bruit et ceux obtenus avec plus de bruit, ce qui est cohérent avec le fait que la variance du terme d'erreur influe directement sur la précision des estimations.
+
+Ces observations montrent clairement comment la quantité de bruit (variance de l'erreur) affecte la précision (et donc la largeur des intervalles de confiance) des coefficients estimés dans un modèle de régression linéaire.
+
+```{r  intervalles de confiance}
+set.seed(1)
+#Le Jeu de données original
+x <- rnorm(100)
+eps_original <- rnorm(100, mean = 0, sd = 0.5)
+y_original <- 2 + 2 * x + eps_original
+model_original <- lm(y_original ~ x)
+ci_original <- confint(model_original, level = 0.95)
+print("Intervalle de confiance (jeu de données original) :")
+print(round(ci_original, 3))
+
+#Le Jeu de données avec plus de bruit
+eps_bruit <- rnorm(100, mean = 0, sd = 1)
+y_bruit <- 2 + 2 * x + eps_bruit
+model_bruit <- lm(y_bruit ~ x)
+ci_bruit <- confint(model_bruit, level = 0.95)
+print("Intervalle de confiance (jeu de données avec plus de bruit) :")
+print(round(ci_bruit, 3))
+
+# Jeu de données avec moins de bruit (ε ~ N(0, 0.25²))
+eps_mbruit <- rnorm(100, mean = 0, sd = 0.25)
+y_mbruit <- 2 + 2 * x + eps_mbruit
+model_mbruit <- lm(y_mbruit ~ x)
+ci_mbruit <- confint(model_mbruit, level = 0.95)
+print("Intervalle de confiance (jeu de données avec moins de bruit) :")
+print(round(ci_mbruit, 3))
+```
 
