@@ -6,9 +6,9 @@ output: html_document
 ---
 
 ```{r librairies_importation, include=FALSE}
-#install.packages("ISLR")
+#install.packages("ISLR2")
 library(tidyverse)
-library("ISLR") #pour charger la librairie auto
+library("ISLR2")
 ```
 
 ### Exercice1 :
@@ -499,15 +499,23 @@ cat('la statistique du test est ' , t_stat_xy )
 La statistique du test est : **t= `r t_stat_xy`**
 
 
-###Question 5
+### Question 5
 
-#a-Dans quelles circonstances l’estimation du coefficient pour la régression de sur est-elle la même que l’estimation du coefficient pour la régression de sur  ?
+#### a) 
+Dans quelles circonstances l’estimation du coefficient pour la régression de y sur x est-elle la même que l’estimation du coefficient pour la régression de x sur  y ?
 
-Dans une régression linéaire sans intercept,l'estimation du coefficient pour la régression de Y sur X est la même que celle de la régression de X sur Y uniquement lorsque la dispersion (la somme des carrés) de X est égale à celle de Y.
+* coefficient de correlation de y sur x : $$ b_{yx}1 = \frac{cov(x,y)}{V(x)}$$
 
-#b-Générons un exemple dans R avec observations dans lequel l’estimation du coefficient pour la régression de sur est différente de l’estimation du coefficient pour la régression de sur .
+* coefficient de correlation de x sur y : $$ b_{xy}1 = \frac{cov(x,y)}{V(y)}$$
 
-```{r exemple estimation du coefficient regression ou X diff Y}
+* $$ b_{yx}1 = b_{xy}1 \iff V(x) = V(y)  $$
+
+l'estimation du coefficient pour la régression de Y sur X est la même que celle de la régression de X sur Y lorsque les variances de x et y sont égales.
+
+#### b)
+Générons un exemple dans R avec des observations dans lequel l’estimation du coefficient pour la régression de y sur x est différente de l’estimation du coefficient pour la régression de x sur y .
+
+```{r difference-coefficient-regression}
 #Exemple : Y = 2 * X (donc c = 2)
 set.seed(123)
 x <- rnorm(100)
@@ -525,7 +533,8 @@ cat("Coefficient pour la régression de Y sur X :", round(coef_y_on_x, 3), "\n")
 cat("Coefficient pour la régression de X sur Y :", round(coef_x_on_y, 3), "\n")
 ```
 
-#c-Générons un exemple dans R avec observations dans lequel l’estimation du coefficient pour la régression de sur est la même que l’estimation du coefficient pour la régression de sur.
+#### c) 
+Générons un exemple dans R avec  des observations dans lequel l’estimation du coefficient pour la régression de y  sur x est la même que l’estimation du coefficient pour la régression de x sur y.
 
 ```{r exemple estimation du coefficient regression ou X,Y}
 set.seed(123)
@@ -543,44 +552,45 @@ coef_X_on_Y <- coef(modele_X_on_Y)
 cat("Coefficient pour la régression de Y sur X :", round(coef_Y_on_X, 3), "\n")
 cat("Coefficient pour la régression de X sur Y :", round(coef_X_on_Y, 3), "\n")
 ```
-###Question 6
+### Question 6
 
-#a)
-Pour créer un vecteur x de 100 observations tirées d'une distribution normale standard (N(0,1)) en assurant la reproductibilité, on vas utiliser
-:
+#### a)
+Pour créer un vecteur x de 100 observations tirées d'une distribution normale standard (N(0,1)) en assurant la reproductibilité, on vas utiliser :
+
 ```{r vecteur x avec 100 observation}
 set.seed(1)
 x <- rnorm(100)
 ```
 
-#b)
+#### b)
 Pour créer un vecteur eps de 100 observations issues d'une distribution normale avec une moyenne nulle et une variance de 0,25 (donc un écart type de 0,5), ont vas utiliser :
 
 ```{r vecteur eps avec 100 observation }
 eps <- rnorm(100, mean = 0, sd = 0.5)
 ```
 
-#c)
+#### c)
 En utilisant x et eps, générons un vecteur y selon le modèle 
 Quelle est la longueur du vecteur y ? 
 la longueur est 100
 
 Quelles sont les valeurs de et dans ce modèle linéaire ?
-La valeur est 2
+La valeur est 
+
 ```{r vecteur y}
 y <- 2 + 2 * x + eps
 length(y)
 ```
 
 
-#d)
+#### d)
 
 Le graphique montre une relation linéaire positive entre x et y, ce qui est conforme au modèle générateur x=2+2𝑥+𝜖de plus aucun comportement non linéaire ni valeurs aberrantes marquées ne semblent apparaître, ce qui confirme que la relation entre x et y est bien linéaire
 ```{r graphe rtion entre X et Y}
 plot(x, y, main = "Nuage de points : x vs y", xlab = "x", ylab = "y", pch = 19, col = "blue")
 ```
 
-#e)
+#### e)
 Le coefficient de l'interception est estimé à environ 2,03 et celui de x à environ 1,98, ce qui est très proche des valeurs théoriques 2 et 2.
 Les p‑values extrêmement faibles (p_value< 2e-16) indiquent que les deux coefficients sont très significatifs.
 Le Multiple R carrée (environ 0.941) montre que le modèle explique une grande partie de la variance de y.
@@ -589,42 +599,30 @@ Ces résultats confirment que le modèle amélioré par moindres carrés reprodu
 ```{r modèle lineaire des moindres carrée }
 set.seed(1)
 x <- rnorm(100)
-#La variance = 0.25, écart type = 0.5
 eps <- rnorm(100, mean = 0, sd = 0.5) 
 y <- 2 + 2 * x + eps
-
-#L'ajustement du modèle linéaire
 modele <- lm(y ~ x)
 summary(modele)
 ```
-#f)
+#### f)
 le nuage de points, ajoute la ligne de régression obtenue par les moindres carrés (modèle ajusté) et la vraie ligne de régression
 
 ```{r Nuage de points avec ligne des moindres carrés et vraie régression}
 set.seed(1)
 x <- rnorm(100)
-#L'écart type = 0.5 pour une variance de 0.25
 eps <- rnorm(100, mean = 0, sd = 0.5)  
 y <- 2 + 2 * x + eps
-
-#La Création du nuage de points
 plot(x, y, main = "Nuage de points avec ligne des moindres carrés et vraie régression",
      xlab = "x", ylab = "y", pch = 19, col = "gray")
-
-#L'ajustement du modèle linéaire par moindres carrés
 modele <- lm(y ~ x)
-
-#On ajout de la ligne des moindres carrés (fitted model) en bleu)
 abline(modele, col = "blue", lwd = 2)
-
-#on ajout de la vraie ligne de régression y = 2 + 2*x en rouge (trait pointillé)
 abline(a = 2, b = 2, col = "red", lwd = 2, lty = 2)
 
 #on ajout d'une légende
 legend("topleft", legend = c("Ligne des moindres carrés", "Régression de la population"),
        col = c("blue", "red"), lty = c(1, 2), lwd = 2)
 ```
-#g)
+#### g)
 
 Explication:
 le modèle générateur est x=2+2 x+ϵ(donc linéaire) et l'ajout du terme x² n'a pas apporter d'amélioration significative.
@@ -636,21 +634,15 @@ set.seed(1)
 x <- rnorm(100)
 eps <- rnorm(100, mean = 0, sd = 0.5)
 y <- 2 + 2 * x + eps
-
-#Le modèle linéaire simple
 model_linear <- lm(y ~ x)
-
-#Le modèle polynomiale (avec x et x^2)
 model_poly <- lm(y ~ x + I(x^2))
 
-#Le résumés des modèles
 summary(model_linear)
 summary(model_poly)
 
-#La comparaison formelle par un test d'anova
 anova(model_linear, model_poly)
 ```
-#h)
+#### h)
 En diminuant la variance du terme d'erreur, on obtient des estimations plus précises et un meilleur ajustement global du modèle aux données, tout en confirmant que le modèle linéaire simple est bien adapté à la structure de la relation simulée.
 
 ```{r processus de génération de données pour diminuer le bruit}
@@ -684,7 +676,7 @@ model_poly <- lm(y ~ x + I(x^2))
 summary(model_poly)
 anova(model_linear, model_poly)
 ```
-#i)
+#### i)
 
 Le fait d'augmenter la variance du terme d'erreur rend le modèle moins précis (erreurs standards plus élevées, R² plus faible), et le nuage de points montre une plus grande dispersion. Cependant, la relation linéaire reste clairement visible, et le modèle amélioré par moindres carrés reste cohérent avec le modèle théorique x=2+2 x+ϵ.
 
@@ -722,7 +714,7 @@ summary(model_poly)
 anova(model_linear, model_poly)
 ```
 
-#j)
+#### j)
 
 Explication:
 Dans le jeu de données avec moins de bruit , la dispersion autour de la droite de régression est plus faible. Par conséquent, les intervalles de confiance pour l'interception et le coefficient de x sont très étroits, reflétant une incertitude moindre dans les estimations.
@@ -760,4 +752,88 @@ ci_mbruit <- confint(model_mbruit, level = 0.95)
 print("Intervalle de confiance (jeu de données avec moins de bruit) :")
 print(round(ci_mbruit, 3))
 ```
+### Question 7
+
+```{r question-7a}
+set.seed(1)
+x1 <-runif(100)
+x2 <- 0.5 * x1 + rnorm(100) / 10
+y <- 2 + 2 * x1 + 0.3 * x2 + rnorm(100)
+```
+
+#### a) 
+
+* forme du modele linéaire : y = 2 + 2x1 + 0.3 x2
+
+* coefficients : intercept = 2, coeff de x1 = 2, coeff de x2 = 0.3
+
+#### b)
+correlation entre x1 et x2
+
+* La correlation entre x1 et x2 est **corr(x,y) = `r round(cor(x1,x2),2)`**
+
+```{r nuage-des-points-x1-x2}
+data <- data.frame(x1, x2)
+ggplot(data, aes(x=x1, y=x2)) +
+  geom_point(color="blue") +
+  labs(title = "Nuage de points entre x1 et x2",
+       x = " ",
+       y = " ")
+
+```
+#### d)
+```{r regression-moindre-carre}
+modele_lmx1_x2 <- lm(y ~ x1 + x2)
+summary(modele_lmx1_x2)
+
+```
+L'intercept et le coefficient de x1 sont très petits, ce qui signifie que ces valeurs sont significatives. En revanche, 
+la p-value de x2 est grand ==> x2 n'a pas d'effet significatif sur y dans notre modèle.
+
+#### d)
+
+```{r prediction-y-en-fonction-de-x1}
+modele_lm_x1 <- lm(y ~ x1)
+summary(modele_lm_x1)
+
+```
+Puisque la p-value associée à x1 est extrêmement faible, nous rejetons l'hypothèse nulle et concluons que 
+x1 a un effet statistiquement significatif sur y
+
+#### e) 
+
+```{r prediction-y-en-fonction-de-x2}
+modele_lm_x2 <- lm(y ~ x2)
+summary(modele_lm_x2)
+
+```
+Puisque la p-value associée à x1 est extrêmement faible, nous rejetons l'hypothèse nulle et concluons que 
+x2 a un effet statistiquement significatif sur y.
+
+#### f) 
+
+Cette contradiction est du au fait de la multicolinéarité entre x1 et x2. 
+
+Seul, x2 a un effet significatif, mais combiné avec x2, son effet est négligeable par ce qu'il lui même 
+expliqué par  x1 via l'expression **x2 <- 0.5 * x1 + rnorm(100) / 10**
+
+#### g)
+
+code fourni non fonctionnel
+
+
+### Question 8 
+
+#### a)
+Trop long
+
+#### b) 
+
+```{r boston}
+head(Boston)
+modele_lin <- lm(crim ~., data = Boston)
+summary(modele_lin)
+```
+* On va rejeter l'hypothese nulle pour les variables 
+'zn', 'indus', 'chas', 'nox', 'age', 'rm', 'tax', 'ptratio', et 'lstat'
 
