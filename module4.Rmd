@@ -156,8 +156,17 @@ predire_mpg <- function(horsepower) {
 }
 predire_mpg(98)
 ```
-La valeur prédite pour 98 cheveaux est **mpg_hat = `r round(predire_mpg(98),2)`**
+La valeur prédite pour 98 chevaux est **mpg_hat = `r round(predire_mpg(98),2)`**
 
+```{r intervalle-confiance-et-intervalle-prediction}
+predict(modele_lineaire, data.frame(horsepower=98),
+        interval="confidence", level=0.95)
+ predict(modele_lineaire, data.frame(horsepower=98),
+         interval="prediction",level=0.95)
+```
+La moyenne estimé du mpg pour horsepower=98 est de 24.47, avec un intervalle de confiance à 95% entre 23.97 et 24.96.
+
+Une nouvelle voiture pour 98 chevaux pourrait avoir un mpg entre 14.80 et 34.12.
 #### b)
 graphique entre la réponse (mpg) et le prédicteur.
 
@@ -781,7 +790,7 @@ ggplot(data, aes(x=x1, y=x2)) +
        y = " ")
 
 ```
-#### d)
+#### c)
 ```{r regression-moindre-carre}
 modele_lmx1_x2 <- lm(y ~ x1 + x2)
 summary(modele_lmx1_x2)
@@ -807,7 +816,7 @@ modele_lm_x2 <- lm(y ~ x2)
 summary(modele_lm_x2)
 
 ```
-Puisque la p-value associée à x1 est extrêmement faible, nous rejetons l'hypothèse nulle et concluons que 
+Puisque la p-value associée à x2 est extrêmement faible, nous rejetons l'hypothèse nulle et concluons que 
 x2 a un effet statistiquement significatif sur y.
 
 #### f) 
@@ -819,14 +828,169 @@ expliqué par  x1 via l'expression **x2 <- 0.5 * x1 + rnorm(100) / 10**
 
 #### g)
 
-code fourni non fonctionnel
+```{r reajustement}
+x1<-c(x1,0.1)
+x2<-c(x2,0.8)
+y<-c(y,6)
 
+# Modèle linéaire par moindre carrée
+modele_lm_x1_x2<-lm(y~x1+x2)
+summary(modele_lm_x1_x2)
+#prédiction de y en fonction de x1
+modele_lm_x1<-lm(y~x1)
+summary(modele_lm_x1)
+
+#prediction de y en fonction de x2
+modele_lm_x2<-lm(y~x2)
+summary(modele_lm_x2)
+plot(y,x1,lwd=3, col="red")
+
+
+```
+
+Avec cette réajustement, pour le modèle linéaire par moindre carrée,la p-value de x1 de 0.36 est supérieure à 0.05 et la p-value de x2 de 0.006 est très petite à 0.05 donc on ne rejette pas l'hypothèse nulle qui est $\ H_0:\beta_1\ =0$, il n'y a pas de relation significative entre x1 et la variable réponse y. Par contre, la p-value de x2 de 0.006 est très petite à 0.05, on rejette $\ H_0:\beta_2\ =0$ on peut conclure qu' il y a une relation significative entre x2 et y.
+
+Pour la prédiction de y en fonction de x1: la p-value =4.30e-05 est très petite à 0.05 donc on rejette $\ H_0:\beta_1\ =0$, on peut conclure qu'il y a une relation siginificative entre x1 et y.
+
+Pour la prédiction de y en fonction de x2 :la p-value de x2 de 1.253e-06 est très petite à 0.05 donc on rejette l'hypothèse nulle qui est  $\beta_2\ =0$, il y a une relation significative entre x2 et la variable réponse y.
+```{r aberrante-levier-x1-x2}
+#Pour le modèle linéaire par moindre carrée
+
+plot(modele_lm_x1_x2)
+#Point à fort effet de levier 
+which.max(hatvalues(modele_lm_x1_x2))
+```
+ L'observation est aberrante avec les points 21,55 et 82 qui sont éloignés des valeurs prédites par le modèle.Oui, on a un point à fort effet de levier qui est de 101.
+
+```{r aberrante-levier-x1}
+#Pour la prédiction de y en fonction de x1
+plot(modele_lm_x1) 
+#Point à fort effet de levier
+which.max(hatvalues(modele_lm_x1))
+
+```
+On a une valeur aberrante pour le point 101.On a un point à fort effet de levier qui est 27.
+```{r aberrante-levier-x2}
+#Pour la prédiction de y en fonction de x2
+plot(modele_lm_x2) 
+
+#Point à fort effet de levier
+which.max(hatvalues(modele_lm_x2))
+
+```
+On a une valeur aberrante pour le point 21,55,82.On a un point à fort effet de levier qui est 101. 
+En conclusion: l'observation  ayant un effet de levier élevé a une valeur inhabituelle pour x2.
 
 ### Question 8 
 
 #### a)
-Trop long
+```{r regression-lineaire-boston}
+View(Boston)
 
+#prédire le taux de criminalité en fonction de la proportion de terrains résidentiels 
+lm_zn<-lm(crim~zn,data=Boston)
+summary(lm_zn)
+
+#prédire le taux de criminalité en fonction de la proportion d'hectares consacrés à d'autres activités que le commerce
+lm_indus<-lm(crim~indus,data=Boston)
+summary(lm_indus)
+
+#prédire le taux de criminalité en fonction de la variable muette 
+lm_chas<-lm(crim~chas,data=Boston)
+summary(lm_chas)
+
+#prédire le taux de criminalité en fonction de la concentration d'oxydes d'azote
+lm_nox<-lm(crim~nox,data=Boston)
+summary(lm_nox)
+
+#prédire le taux de criminalité en fonction du nombre moyen de pièces par logement
+lm_rm<-lm(crim~rm,data=Boston)
+summary(lm_rm)
+
+#prédire le taux de criminalité en fonction de la proportion de logements occupés par leur propriétaire
+lm_age<-lm(crim~age,data=Boston)
+summary(lm_age)
+
+#prédire le taux de criminalité en fonction de l'indice d'accessibilité aux autoroutes radiales
+lm_rad<-lm(crim~rad,data=Boston)
+summary(lm_rad)
+
+#prédire le taux de criminalité en fonction du taux d'imposition
+lm_tax<-lm(crim~tax,data=Boston)
+summary(lm_tax)
+
+#prédire le taux de criminalité en fonction du taux d'encadrement par ville 
+lm_ptratio<-lm(crim~ptratio,data=Boston)
+summary(lm_ptratio)
+
+#prédire le taux de criminalité en fonction du statut inférieur de la population
+lm_lstat<-lm(crim~lstat,data=Boston)
+summary(lm_lstat)
+
+#prédire le taux de criminalité en fonction de la valeur médiane des maisons occupées par leur propriétaire
+lm_medv<-lm(crim~medv,data=Boston)
+summary(lm_medv)
+
+#Graphique 
+plot(crim~zn,data=Boston)
+abline(lm_zn, col="red")
+
+plot(crim~indus,data=Boston)
+abline(lm_indus, col="red")
+
+plot(crim~nox,data=Boston)
+abline(lm_nox, col="red")
+
+plot(crim~rm,data=Boston)
+abline(lm_rm, col="red")
+
+plot(crim~age,data=Boston)
+abline(lm_age, col="red")
+
+plot(crim~rad,data=Boston)
+abline(lm_rad, col="red") 
+
+plot(crim~tax,data=Boston)
+abline(lm_tax, col="red") 
+
+plot(crim~ptratio,data=Boston)
+abline(lm_ptratio, col="red")
+
+plot(crim~lstat,data=Boston)
+abline(lm_lstat, col="red")
+
+plot(crim~medv,data=Boston)
+abline(lm_medv, col="red")
+```
+
+
+
+
+Pour le prédicteur Zn, on a un p-value de 5.51e-06 qui est plus petit que 0.05. On rejette l'hypothèse nulle $\ H_0: \beta_1\ = 0$. Il y a une relation significative entre la proportion de terrains résidentiels(zn) et le taux de criminalité (crim).
+
+Pour le prédicteur Indus, on a une p-value (2e-16) qui est plus petit que 0.05. On rejette l'hypothèse nulle $\ H_0: \beta_2\ = 0$. Il y a une relation significative entre la proportion d'hectares consacrés à d'autres activités (indus) et le taux de criminalité.
+
+Pour le prédicteur Chas, on a une p-value (0.209) qui est plus grand que 0.05. On ne rejette pasl'hypothèse nulle $\ H_0: \beta_3\ = 0$. Il n'y a pas de relation significative entre la variable muette Charles River(Chas) (c'est à dire que le territoire soit boirdé par la rivière ou non) et le taux de criminalité.
+
+Pour le prédicteur Nox, on a une p-value (2e-16) qui est plus petit que 0.05. On  rejette l'hypothèse nulle $\ H_0: \beta_4\ = 0$. Il y a  une relation significative entre la concentration d'oxydes d'azote(nox)  et le taux de criminalité.
+
+Pour le prédicteur Rm, on a une p-value (6.35e-07) qui est plus petit que 0.05. On  rejette l'hypothèse nulle $\ H_0: \beta_5\ = 0$. Il y a  une relation significative entre le nombre moyen de pièces par logement(rm)  et le taux de criminalité.
+
+Pour le prédicteur Age, on a une p-value (2.85e-16) qui est plus petit que 0.05. On  rejette l'hypothèse nulle $\ H_0: \beta_6\ = 0$. Il y a  une relation significative entre la proportion de logements occupés par leur propriétaire (age)  et le taux de criminalité.
+
+Pour le prédicteur Rad, on a une p-value (2e-16) qui est plus petit que 0.05. On  rejette l'hypothèse nulle $\ H_0: \beta_7\ = 0$. Il y a  une relation significative entre l'indice d'accessibilité aux autoroutes radiales  (rad)  et le taux de criminalité.
+
+Pour le prédicteur Tax, on a une p-value (2e-16) qui est plus petit que 0.05. On  rejette l'hypothèse nulle $\ H_0: \beta_8\ = 0$. Il y a  une relation significative entre le taux d'imposition  (tax)  et le taux de criminalité.
+
+Pour le prédicteur Ptratio, on a une p-value (2.94e-11) qui est plus petit que 0.05. On  rejette l'hypothèse nulle $\ H_0: \beta_9\ = 0$. Il y a  une relation significative entre le taux d'encadrement  (ptratio)  et le taux de criminalité.
+
+Pour le prédicteur Lstat, on a une p-value (2e-16) qui est plus petit que 0.05. On  rejette l'hypothèse nulle H0: Beta_10=0 . Il y a  une relation significative entre le statut inférieur de la population  (lstat)  et le taux de criminalité.
+
+Pour le prédicteur Medv, on a une p-value (2e-16) qui est plus petit que 0.05. On  rejette l'hypothèse nulle H0: Beta_11=0 . Il y a  une relation significative entre la valeur médiane des maisons occupées par leur propriétaire (medv)  et le taux de criminalité.
+
+En résumé, il existe des relations significatives entre chaque prédicteur Zn, Indus, Nox, rm, age, ,rad,tax,ptratio,lstat et medv  et la réponse.
+
+Les graphiques nous ont permis pour certains modèles de confirmer les relations entre le prédicteur et la réponse toutefois pour le prédicteur indice d'accessibilité aux autoroutes radiales (rad), la relation n'est pas bien representé sur le graphique.
 #### b) 
 
 ```{r boston}
@@ -836,4 +1000,58 @@ summary(modele_lin)
 ```
 * On va rejeter l'hypothese nulle pour les variables 
 'zn', 'indus', 'chas', 'nox', 'age', 'rm', 'tax', 'ptratio', et 'lstat'
+
+### c)
+
+Pour le modèle de régression simple, il existe une relation significative entre tous les prédicteurs et la réponse sauf pour le prédicteur chas. Hors pour le modèle de régression multiple, le prédicteur chas a une relation significative avec la réponse . Ce qui peut être expliquer par le fait que le prédicteur chas (variable muette Charles River) explique les autres variables prédicteurs.
+```{r coefficient-univariée-multiple }
+
+
+```
+
+### d) 
+
+```{r association-non-lineaire}
+# Modèle pour le prédicteur Zn (a verifier)
+
+modele_zn<-lm(crim~poly(zn,3),data=Boston)
+summary(modele_zn)
+
+#modèle pour le prédicteur indus 
+modele_indus<-lm(crim~poly(indus,3),data=Boston)
+summary(modele_indus)
+
+#modèle pour le prédicteur nox 
+modele_nox<-lm(crim~poly(nox,3),data=Boston)
+summary(modele_nox)
+
+#modèle pour le prédicteur rm (a verifier)
+modele_rm<-lm(crim~poly(rm,3),data=Boston)
+summary(modele_rm)
+
+#modèle pour le prédicteur age
+modele_age<-lm(crim~poly(age,3),data=Boston)
+summary(modele_age)
+
+#modèle pour le prédicteur rad
+modele_rad<-lm(crim~poly(rad,3),data=Boston)
+summary(modele_rad)
+
+#modèle pour le prédicteur tax
+modele_tax<-lm(crim~poly(tax,3),data=Boston)
+summary(modele_tax)
+#modèle pour le prédicteur ptratio
+modele_ptratio<-lm(crim~poly(ptratio,3),data=Boston)
+summary(modele_ptratio)
+#modèle pour le prédicteur lstat
+modele_lstat<-lm(crim~poly(lstat,3),data=Boston)
+summary(modele_lstat)
+#modèle pour le prédicteur medv
+modele_medv<-lm(crim~poly(medv,3),data=Boston)
+summary(modele_medv)
+
+```
+
+Il existe une relation non linéaire significative pour le prédicteur 'Zn', 'Indus', 'nox','rm','age','rad','tax','ptratio',';stat','medv' car
+on a un p-value inférieur à 0.05.
 
